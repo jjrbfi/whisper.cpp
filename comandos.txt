@@ -1,0 +1,10 @@
+hello
+place
+bye
+cat
+red
+blue
+go to place 3
+pick the item on place 2
+pick the item on place 5
+put the item on place 8

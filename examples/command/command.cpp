@@ -218,23 +218,18 @@ int process_command_list(struct whisper_context * ctx, audio_async &audio, const
         whisper_token tokens[1024];
         allowed_tokens.emplace_back();
 
-        for (int l = 0; l < (int) cmd.size(); ++l) {
-            // NOTE: very important to add the whitespace !
-            //       the reason is that the first decoded token starts with a whitespace too!
-            std::string ss = std::string(" ") + cmd.substr(0, l + 1);
-
-            const int n = whisper_tokenize(ctx, ss.c_str(), tokens, 1024);
-            if (n < 0) {
-                fprintf(stderr, "%s: error: failed to tokenize command '%s'\n", __func__, cmd.c_str());
-                return 3;
-            }
-
-            if (n == 1) {
-                allowed_tokens.back().push_back(tokens[0]);
-            }
+        // Tokenize the entire command sentence
+        const int n = whisper_tokenize(ctx, cmd.c_str(), tokens, 1024);
+        if (n < 0) {
+            fprintf(stderr, "%s: error: failed to tokenize command '%s'\n", __func__, cmd.c_str());
+            return 3;
         }
 
-        max_len = std::max(max_len, (int) cmd.size());
+        for (int i = 0; i < n; ++i) {
+            allowed_tokens.back().push_back(tokens[i]);
+        }
+
+        max_len = std::max(max_len, n);
     }
 
     fprintf(stderr, "%s: allowed commands [ tokens ]:\n", __func__);
